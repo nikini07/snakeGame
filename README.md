@@ -16,25 +16,6 @@ Python 3.12: Install via python.org or Homebrew (brew install python@3.12).
 Pygame: Install with python3.12 -m pip install pygame.
 Git: Required to clone the repository.
 
-## Installation
-
-Clone the Repository:
-git clone https://github.com/nikkisusername/snake-game-project.git
-cd snake-game-project
-
-
-Replace username with your GitHub username.
-Use a Personal Access Token (PAT) for authentication (see GitHub PAT Guide).
-
-
-Install Dependencies:
-python3.12 -m pip install pygame
-
-
-
-Running the Game
-python3.12 snake_game.py
-
 ## Gameplay
 
 Start: The snake (green, with head and tail) appears stationary at the center of a brown grid.

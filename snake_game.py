@@ -68,3 +68,34 @@ def draw_snake(snake_list, direction):
 # Function to draw food (larger red ball)
 def draw_food(food_x, food_y):
     pygame.draw.circle(dis, red, (food_x + snake_block // 2, food_y + snake_block // 2), snake_block // 2)
+    
+    # Function to display score
+def show_score(score):
+    score_text = score_font.render(f"Score: {score}", True, text_color)
+    dis.blit(score_text, [10, 10])
+
+# Function to display game over screen
+def game_over_screen(score):
+    dis.fill(brown)
+    draw_grid()
+    game_over_text = font.render("Game Over!", True, text_color)
+    score_text = font.render(f"Final Score: {score}", True, text_color)
+    retry_text = font.render("Retry", True, white)
+    quit_text = font.render("Quit", True, white)
+    
+    retry_rect = pygame.Rect(width // 2 - 100, height // 2, 80, 40)
+    quit_rect = pygame.Rect(width // 2 + 20, height // 2, 80, 40)
+    
+    mouse_pos = pygame.mouse.get_pos()
+    retry_color = button_hover if retry_rect.collidepoint(mouse_pos) else button_color
+    quit_color = button_hover if quit_rect.collidepoint(mouse_pos) else button_color
+    
+    dis.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 3))
+    dis.blit(score_text, (width // 2 - score_text.get_width() // 2, height // 3 + 50))
+    pygame.draw.rect(dis, retry_color, retry_rect)
+    pygame.draw.rect(dis, quit_color, quit_rect)
+    dis.blit(retry_text, (retry_rect.x + 15, retry_rect.y + 5))
+    dis.blit(quit_text, (quit_rect.x + 15, quit_rect.y + 5))
+    
+    pygame.display.update()
+    return retry_rect, quit_rect

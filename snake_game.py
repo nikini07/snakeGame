@@ -99,3 +99,119 @@ def game_over_screen(score):
     
     pygame.display.update()
     return retry_rect, quit_rect
+
+# Main game loop
+def game_loop():
+    game_over = False
+    game_close = False
+    first_frame = True  # Skip collision check on first frame
+    
+    # Initialize snake position and direction
+    x1 = (width // snake_block // 2) * snake_block  # 400
+    y1 = (height // snake_block // 2) * snake_block  # 300
+    x1_change = 0
+    y1_change = 0
+    direction = "RIGHT"
+    
+    snake_list = []
+    snake_length = 2  # Start with head and tail
+    snake_list.append([x1 - snake_block, y1])  # Tail at [380, 300]
+    snake_list.append([x1, y1])               # Head at [400, 300]
+    
+    food_x = round(random.randrange(0, width - snake_block) / snake_block) * snake_block
+    food_y = round(random.randrange(0, height - snake_block) / snake_block) * snake_block
+    
+    # Ensure food doesn't spawn on snake
+    while [food_x, food_y] in snake_list:
+        food_x = round(random.randrange(0, width - snake_block) / snake_block) * snake_block
+        food_y = round(random.randrange(0, height - snake_block) / snake_block) * snake_block
+    
+    clock = pygame.time.Clock()
+    
+    while not game_over:
+        while game_close:
+            retry_rect, quit_rect = game_over_screen(snake_length - 2)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_over = True
+                    game_close = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if retry_rect.collidepoint(event.pos):
+                        return True  # Restart game
+                    if quit_rect.collidepoint(event.pos):
+                        return False  # Quit game
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT and x1_change == 0:
+                    x1_change = -snake_block
+                    y1_change = 0
+                    direction = "LEFT"
+                elif event.key == pygame.K_RIGHT and x1_change == 0:
+                    x1_change = snake_block
+                    y1_change = 0
+                    direction = "RIGHT"
+                elif event.key == pygame.K_UP and y1_change == 0:
+                    y1_change = -snake_block
+                    x1_change = 0
+                    direction = "UP"
+                elif event.key == pygame.K_DOWN and y1_change == 0:
+                    y1_change = snake_block
+                    x1_change = 0
+                    direction = "DOWN"
+        
+        # Only update position if movement has started
+        if x1_change != 0 or y1_change != 0:
+            x1 += x1_change
+            y1 += y1_change
+            snake_head = [x1, y1]
+            snake_list.append(snake_head)
+            if len(snake_list) > snake_length:
+                del snake_list[0]
+        
+        # Check boundaries
+        if x1 >= width or x1 < 0 or y1 >= height or y1 < 0:
+            game_close = True
+        
+        # Check self-collision (skip on first frame)
+        if not first_frame and (x1_change != 0 or y1_change != 0):
+            for segment in snake_list[:-1]:
+                if segment == snake_head:
+                    game_close = True
+        
+        # Update display
+        dis.fill(brown)
+        draw_grid()
+        draw_food(food_x, food_y)
+        draw_snake(snake_list, direction)
+        show_score(snake_length - 2)
+        pygame.display.update()
+        
+        # Check if food is eaten
+        if x1 == food_x and y1 == food_y:
+            food_x = round(random.randrange(0, width - snake_block) / snake_block) * snake_block
+            food_y = round(random.randrange(0, height - snake_block) / snake_block) * snake_block
+            while [food_x, food_y] in snake_list:
+                food_x = round(random.randrange(0, width - snake_block) / snake_block) * snake_block
+                food_y = round(random.randrange(0, height - snake_block) / snake_block) * snake_block
+            snake_length += 1
+        
+        # Adjust speed based on score
+        score = snake_length - 2
+        speed = base_speed + (score // 5)  # Increase speed every 5 points
+        if speed > max_speed:
+            speed = max_speed
+        clock.tick(speed)
+        
+        first_frame = False
+    
+    pygame.quit()
+    return False
+
+# Run the game
+while True:
+    if not game_loop():
+        break
+    

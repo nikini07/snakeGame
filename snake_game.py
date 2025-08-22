@@ -206,6 +206,9 @@ def game_loop():
         clock.tick(speed)
         
         first_frame = False
+        
+        # Debug: Print state after each update
+        print(f"Frame: Head=[{x1}, {y1}], Snake={snake_list}, Moving={direction}")
     
     pygame.quit()
     return False
